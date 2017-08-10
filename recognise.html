@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Recognise</title>
+</head>
+<body>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/annyang/2.6.0/annyang.min.js"></script>
+<script type="text/javascript">
+	var recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition || window.mozSpeechRecognition || window.msSpeechRecognition)();
+recognition.lang = 'en-US';
+recognition.interimResults = false;
+recognition.maxAlternatives = 5;
+recognition.start();
+
+</script>
+<p>hi</p>
+<script>
+    var x=0;
+
+  if (annyang) {
+    // Let's define our first command. First the text we expect, and then the function it should call
+    var commands = {
+      'increase': function() {
+        x=x+1;
+        document.getElementsByTagName("p")[0].innerHTML=x;
+      },
+      'decrease': function() {
+        x=x-1;
+        document.getElementsByTagName("p")[0].innerHTML=x;      
+      },
+      'bhenchod': function() {
+        document.getElementsByTagName("p")[0].innerHTML="Beta baap ko gaali dega";      }
+      };
+
+    // Add our commands to annyang
+    annyang.addCommands(commands);
+
+    // Start listening. You can call this here, or attach this call to an event, button, etc.
+    annyang.start();
+  }
+  </script>
+</body>
+</html>
