@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="artyom.window.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+
+	<title>Talking Robot</title>
+</head>
+<body>
+<ul id="chat">
+</ul>
+<p id="span-preview"></p>
+<button id="button-start">Start Dictation</button>
+<button id="button-stop">Stop Dictation</button>
+<script type="text/javascript">
+// Or if installed from NPM to use with a bundler
+// const artyom = require("artyom.js");
+const artyom = new Artyom();
+// Add a single command
+var commandHello = {
+    indexes:["hello","good morning","hey"], // These spoken words will trigger the execution of the command
+    action:function(){ // Action to be executed when a index match with spoken word
+        artyom.say("Hey buddy ! How are you today?");
+    }
+};
+
+artyom.addCommands(commandHello); // Add the command with addCommands method. Now
+
+// Or add multiple commands at time
+var myGroup = [
+    {
+        description:"If my database contains the name of a person say something",
+        smart:true, // a Smart command allow you to use wildcard in order to retrieve words that the user should say
+        // Ways to trigger the command with the voice
+        indexes:["Do you know who is *","I don't know who is *","Is * a good person"],
+        // Do something when the commands is triggered
+        action:function(i,wildcard){
+            var database = ["Piyush","Pratyush","Jaskirat","Anukarsh","KP"];
+
+            //If the command "is xxx a good person" is triggered do, else
+            if(i == 2){
+                if(database.indexOf(wildcard.trim())){
+                    artyom.say("Yes "+wildcard+"is a short person");
+                }else{
+                    artyom.say("I don't know who is " + wildcard + " and i cannot say if is a good person");
+                }
+            }else{
+                if(database.indexOf(wildcard.trim())){
+                    artyom.say("Of course i know who is "+ wildcard + ". A really good person and friend");
+                }else{
+                    artyom.say("My database is not big enough, I don't know who is " + wildcard);
+                }
+            }
+        }
+    },
+    {
+        indexes:["What time is it","Is too late"],
+        action:function(i){ // var i returns the index of the recognized command in the previous array
+            if(i == 0){
+                aFunctionThatSaysTheTime(new Date());
+            }else if(i == 1){
+                artyom.say("Never is too late to do something my friend !");
+            }
+        }
+    }
+];
+
+artyom.addCommands(myGroup);
+
+var control = [
+	{
+	    indexes:["don't obey"], // These spoken words will trigger the execution of the command
+	    action:function(){ // Action to be executed when a index match with spoken word
+	        artyom.say("Wait for 10 seconds to start obeying again");
+	        artyom.dontObey();
+            setTimeout(function(){
+    artyom.obey();
+
+    // execute the say hi command and then it will work !
+}, 10000);
+	    }
+	}
+];
+artyom.addCommands(control);
+artyom.redirectRecognizedTextOutput((recognized,isFinal) => {
+    //if(isFinal){
+        // Nothing
+    //    $("#span-preview").text("");
+    //}else{
+      //  $("#span-preview").text(recognized);
+    //}
+    if (isFinal) {
+        $("#chat").append("<li>"+recognized+"</li>");
+    }
+});
+var settings = {
+    continuous:true, // Don't stop never because i have https connection
+    onResult:function(text){
+        // Show the Recognized text in the console
+        console.log("Recognized text: ", text);
+    },
+    onStart:function(){
+        console.log("Dictation started by the user");
+    },
+    onEnd:function(){
+        alert("Dictation stopped by the user");
+    }
+};
+
+var UserDictation = artyom.newDictation(settings);
+
+// Link the events to buttons in the document
+$("#button-start").click(function(){
+    // Start the Dictation
+    UserDictation.start();
+});
+
+$("#button-stop").click(function(){
+    // Stop the Dictation
+    UserDictation.stop();
+});
+
+// Stop whenever you want
+// UserDictation.stop();
+
+// Initialize artyom
+// <some code to initialize>
+// <add "say hi" command>
+// then set dontObey
+
+// Try to execute the say hi command, nothing will happen
+// but in 10 seconds, the command recognition will be available again
+
+
+
+artyom.initialize({
+    continuous:true,
+    lang:"en-US",
+    obeyKeyword: "listen to me",
+    listen:true,
+    debug:true
+});
+// obeyKeyword
+// command : "play some music"
+// To execute immediately though you can still talking, say :
+// play some music and do it now
+artyom.initialize({
+    continuous:true,
+    lang:"en-US",
+    executionKeyword: "and do it now",
+    listen:true,
+    debug:true
+});
+
+</script>
+</body>
+</html>
